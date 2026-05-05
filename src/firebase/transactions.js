@@ -5,11 +5,15 @@ import {
   deleteDoc,
   updateDoc,
   doc,
+  serverTimestamp,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "./config";
 
 export async function getTransactions() {
-  const querySnapshot = await getDocs(collection(db, "transactions"));
+  const q = query(collection(db, "transactions"), orderBy("createdAt", "desc"));
+  const querySnapshot = await getDocs(q);
 
   return querySnapshot.docs.map((doc) => ({
     id: doc.id,
@@ -22,6 +26,7 @@ export async function addTransaction(data) {
     ...data,
     amount: Number(data.amount),
     month: data.date.slice(0, 7),
+    createdAt: serverTimestamp(),
   });
 }
 

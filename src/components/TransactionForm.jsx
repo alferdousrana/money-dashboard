@@ -33,6 +33,16 @@ function TransactionForm({
     });
   }
 
+  function resetForm() {
+    setForm({
+      type: "expense",
+      category: "",
+      amount: "",
+      date: "",
+      note: "",
+    });
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -51,14 +61,7 @@ function TransactionForm({
     }
 
     onTransactionAdded();
-
-    setForm({
-      type: "expense",
-      category: "",
-      amount: "",
-      date: "",
-      note: "",
-    });
+    resetForm();
   }
 
   return (
@@ -114,7 +117,14 @@ function TransactionForm({
 
       <div className="form-actions">
         {editingTransaction && (
-          <button type="button" className="cancel-btn" onClick={onCancelEdit}>
+          <button
+            type="button"
+            className="cancel-btn"
+            onClick={() => {
+              resetForm();
+              onCancelEdit();
+            }}
+          >
             Cancel
           </button>
         )}

@@ -49,9 +49,9 @@ function App() {
 
       <section className="hero">
         <div>
-          <p className="eyebrow">Personal Finance</p>
-          <h1>Money Dashboard</h1>
-          <p>Track your income, expenses, balance, and monthly spending.</p>
+          <p className="eyebrow">Al Ferdous Finance</p>
+          <h1>Dashboard</h1>
+          <p>Track income, expenses, balance, and monthly spending.</p>
         </div>
       </section>
 
