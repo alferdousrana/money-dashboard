@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, logout } from "./firebase/auth";
 import { deleteTransaction, getTransactions } from "./firebase/transactions";
 import TransactionForm from "./components/TransactionForm";
 import DashboardCards from "./components/DashboardCards";
@@ -6,10 +8,22 @@ import Layout from "./components/Layout";
 import Topbar from "./components/Topbar";
 import TransactionTable from "./components/TransactionTable";
 import ExpenseChart from "./components/ExpenseChart";
+import Login from "./components/Login";
 
 function App() {
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
   const [editingTransaction, setEditingTransaction] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   async function loadData() {
     const data = await getTransactions();
@@ -17,12 +31,13 @@ function App() {
   }
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (user) {
+      loadData();
+    }
+  }, [user]);
 
   async function handleDelete(id) {
     const confirmDelete = confirm("Delete this transaction?");
-
     if (!confirmDelete) return;
 
     await deleteTransaction(id);
@@ -31,6 +46,14 @@ function App() {
 
   function handleCancelEdit() {
     setEditingTransaction(null);
+  }
+
+  if (authLoading) {
+    return <p className="loading-text">Loading...</p>;
+  }
+
+  if (!user) {
+    return <Login />;
   }
 
   const totalIncome = transactions
@@ -45,13 +68,13 @@ function App() {
 
   return (
     <Layout>
-      {/* <Topbar /> */}
+      <Topbar onLogout={logout} userEmail={user.email} />
 
       <section className="hero">
         <div>
-          <p className="eyebrow">Al Ferdous Finance</p>
-          <h1>Dashboard</h1>
-          <p>Track income, expenses, balance, and monthly spending.</p>
+          <p className="eyebrow">Personal Finance</p>
+          <h1>Money Dashboard</h1>
+          <p>Track your income, expenses, balance, and monthly spending.</p>
         </div>
       </section>
 

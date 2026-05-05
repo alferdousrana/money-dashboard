@@ -1,12 +1,16 @@
-function Topbar() {
+function Topbar({ onLogout, userEmail }) {
   return (
     <header className="topbar">
-      <h3>Financial Dashboard</h3>
+      <div>
+        <h3>Financial Dashboard</h3>
+        <small>{userEmail}</small>
+      </div>
 
       <div className="topbar-actions">
         <input type="text" placeholder="Search transactions..." />
-        <span>🔔</span>
-        <span>⚙️</span>
+        <button className="logout-btn" onClick={onLogout}>
+          Logout
+        </button>
       </div>
     </header>
   );
