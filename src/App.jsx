@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
-import { getTransactions } from "./firebase/transactions";
+import { deleteTransaction, getTransactions } from "./firebase/transactions";
 import TransactionForm from "./components/TransactionForm";
+import DashboardCards from "./components/DashboardCards";
+import Layout from "./components/Layout";
+import Topbar from "./components/Topbar";
+import TransactionTable from "./components/TransactionTable";
+import ExpenseChart from "./components/ExpenseChart";
 
 function App() {
   const [transactions, setTransactions] = useState([]);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
   async function loadData() {
     const data = await getTransactions();
@@ -13,6 +19,19 @@ function App() {
   useEffect(() => {
     loadData();
   }, []);
+
+  async function handleDelete(id) {
+    const confirmDelete = confirm("Delete this transaction?");
+
+    if (!confirmDelete) return;
+
+    await deleteTransaction(id);
+    await loadData();
+  }
+
+  function handleCancelEdit() {
+    setEditingTransaction(null);
+  }
 
   const totalIncome = transactions
     .filter((item) => item.type === "income")
@@ -25,27 +44,43 @@ function App() {
   const balance = totalIncome - totalExpense;
 
   return (
-    <main>
-      <h1>Money Dashboard</h1>
+    <Layout>
+      {/* <Topbar /> */}
 
-      <TransactionForm onTransactionAdded={loadData} />
-
-      <section>
-        <h2>Total Income: ৳{totalIncome}</h2>
-        <h2>Total Expense: ৳{totalExpense}</h2>
-        <h2>Balance: ৳{balance}</h2>
+      <section className="hero">
+        <div>
+          <p className="eyebrow">Personal Finance</p>
+          <h1>Money Dashboard</h1>
+          <p>Track your income, expenses, balance, and monthly spending.</p>
+        </div>
       </section>
 
-      <h2>Transactions</h2>
+      <DashboardCards
+        totalIncome={totalIncome}
+        totalExpense={totalExpense}
+        balance={balance}
+      />
 
-      {transactions.map((item) => (
-        <div key={item.id}>
-          <p>
-            {item.type} - {item.category} - ৳{item.amount}
-          </p>
+      <section className="content-grid">
+        <div className="form-card">
+          <h3>{editingTransaction ? "Edit Transaction" : "Add Transaction"}</h3>
+
+          <TransactionForm
+            onTransactionAdded={loadData}
+            editingTransaction={editingTransaction}
+            onCancelEdit={handleCancelEdit}
+          />
         </div>
-      ))}
-    </main>
+
+        <ExpenseChart transactions={transactions} />
+      </section>
+
+      <TransactionTable
+        transactions={transactions}
+        onEdit={setEditingTransaction}
+        onDelete={handleDelete}
+      />
+    </Layout>
   );
 }
 

@@ -1,14 +1,30 @@
-import { useState } from "react";
-import { addTransaction } from "../firebase/transactions";
+import { useEffect, useState } from "react";
+import { addTransaction, updateTransaction } from "../firebase/transactions";
 
-function TransactionForm({ onTransactionAdded }) {
+function TransactionForm({
+  onTransactionAdded,
+  editingTransaction,
+  onCancelEdit,
+}) {
   const [form, setForm] = useState({
-    type: "income",
+    type: "expense",
     category: "",
     amount: "",
     date: "",
     note: "",
   });
+
+  useEffect(() => {
+    if (editingTransaction) {
+      setForm({
+        type: editingTransaction.type || "expense",
+        category: editingTransaction.category || "",
+        amount: editingTransaction.amount || "",
+        date: editingTransaction.date || "",
+        note: editingTransaction.note || "",
+      });
+    }
+  }, [editingTransaction]);
 
   function handleChange(e) {
     setForm({
@@ -20,13 +36,24 @@ function TransactionForm({ onTransactionAdded }) {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    await addTransaction(form);
+    if (!form.category || !form.amount || !form.date) {
+      alert("Please fill required fields");
+      return;
+    }
+
+    if (editingTransaction) {
+      await updateTransaction(editingTransaction.id, form);
+      alert("Transaction updated!");
+      onCancelEdit();
+    } else {
+      await addTransaction(form);
+      alert("Transaction added!");
+    }
+
     onTransactionAdded();
 
-    alert("Transaction added!");
-
     setForm({
-      type: "income",
+      type: "expense",
       category: "",
       amount: "",
       date: "",
@@ -35,42 +62,67 @@ function TransactionForm({ onTransactionAdded }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <select name="type" value={form.type} onChange={handleChange}>
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
+    <form className="txn-form" onSubmit={handleSubmit}>
+      <div className="form-row">
+        <label>Type</label>
+        <select name="type" value={form.type} onChange={handleChange}>
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+      </div>
 
-      <input
-        name="category"
-        value={form.category}
-        onChange={handleChange}
-        placeholder="Category"
-      />
+      <div className="form-row">
+        <label>Category</label>
+        <input
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+          placeholder="e.g. Food, Salary"
+        />
+      </div>
 
-      <input
-        name="amount"
-        type="number"
-        value={form.amount}
-        onChange={handleChange}
-        placeholder="Amount"
-      />
+      <div className="form-row">
+        <label>Amount (৳)</label>
+        <input
+          name="amount"
+          type="number"
+          value={form.amount}
+          onChange={handleChange}
+          placeholder="0"
+        />
+      </div>
 
-      <input
-        name="date"
-        type="date"
-        value={form.date}
-        onChange={handleChange}
-      />
+      <div className="form-row">
+        <label>Date</label>
+        <input
+          name="date"
+          type="date"
+          value={form.date}
+          onChange={handleChange}
+        />
+      </div>
 
-      <input
-        name="note"
-        value={form.note}
-        onChange={handleChange}
-        placeholder="Note"
-      />
+      <div className="form-row">
+        <label>Note</label>
+        <input
+          name="note"
+          value={form.note}
+          onChange={handleChange}
+          placeholder="Optional"
+        />
+      </div>
 
-      <button type="submit">Add Transaction</button>
+      <div className="form-actions">
+        {editingTransaction && (
+          <button type="button" className="cancel-btn" onClick={onCancelEdit}>
+            Cancel
+          </button>
+        )}
+
+        <button className="submit-btn" type="submit">
+          {editingTransaction ? "Update Transaction" : "+ Add Transaction"}
+        </button>
+      </div>
     </form>
   );
 }
