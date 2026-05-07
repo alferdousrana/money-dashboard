@@ -1,7 +1,17 @@
 function TransactionTable({ transactions, onEdit, onDelete }) {
+   const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <div className="table-card">
-      <h3>Transaction History</h3>
+    <div className="table-card print-area">
+      <div className="table-header">
+        <h3>Transaction History</h3>
+
+        <button className="print-btn no-print" onClick={handlePrint}>
+          🖨️ Print
+        </button>
+      </div>
 
       <table>
         <thead>
@@ -11,7 +21,7 @@ function TransactionTable({ transactions, onEdit, onDelete }) {
             <th>Date</th>
             <th>Note</th>
             <th>Amount</th>
-            <th>Actions</th>
+             <th className="no-print">Actions</th>
           </tr>
         </thead>
 
@@ -40,15 +50,10 @@ function TransactionTable({ transactions, onEdit, onDelete }) {
                 {item.type === "income" ? "+" : "-"}৳{item.amount}
               </td>
 
-              <td>
+              <td className="no-print">
                 <div className="action-buttons">
-                  <button className="edit-btn" onClick={() => onEdit(item)}>
-                    ✏️
-                  </button>
-
-                  <button className="delete-btn" onClick={() => onDelete(item.id)}>
-                    🗑️
-                  </button>
+                  <button className="edit-btn" onClick={() => onEdit(item)}>✏️</button>
+                  <button className="delete-btn" onClick={() => onDelete(item.id)}>🗑️</button>
                 </div>
               </td>
             </tr>
