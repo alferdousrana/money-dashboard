@@ -1,0 +1,111 @@
+/* TransactionTable.css */
+
+.table-card {
+  background: white;
+  padding: 24px;
+  border-radius: 18px;
+  overflow-x: auto;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.print-btn {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.print-btn:hover {
+  background: #1d4ed8;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #f9fafb;
+}
+
+th {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+td {
+  padding: 16px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.badge {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.income {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.expense {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.amount {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.income-text {
+  color: #16a34a;
+}
+
+.expense-text {
+  color: #dc2626;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-btn,
+.delete-btn {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.edit-btn {
+  background: #dbeafe;
+}
+
+.delete-btn {
+  background: #fee2e2;
+}
