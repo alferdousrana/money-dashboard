@@ -1,4 +1,4 @@
-function Topbar({ onLogout, userEmail }) {
+function Topbar({ onLogout, userEmail, selectedMonth, onMonthChange }) {
   return (
     <header className="topbar">
       <div>
@@ -7,7 +7,13 @@ function Topbar({ onLogout, userEmail }) {
       </div>
 
       <div className="topbar-actions">
-        <input type="text" placeholder="Search transactions..." />
+        <input
+          type="month"
+          value={selectedMonth}
+          onChange={(e) => onMonthChange(e.target.value)}
+          className="month-selector"
+          title="Filter by month"
+        />
         <button className="logout-btn" onClick={onLogout}>
           Logout
         </button>

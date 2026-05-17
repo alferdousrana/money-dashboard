@@ -119,6 +119,30 @@ select {
   outline: none;
 }
 
+.month-selector {
+  width: 160px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  padding: 10px 14px;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  font-weight: 500;
+  color: #0f172a;
+  transition: all 0.3s ease;
+}
+
+.month-selector:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.month-selector:focus {
+  border-color: #2563eb;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
 .hero {
   background: linear-gradient(135deg, #2563eb, #7c3aed);
   color: white;

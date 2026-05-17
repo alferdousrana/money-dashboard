@@ -15,6 +15,7 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
   const [editingTransaction, setEditingTransaction] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -33,6 +34,10 @@ function App() {
   useEffect(() => {
     if (user) {
       loadData();
+      // Set default month to current month
+      const today = new Date();
+      const currentMonth = today.toISOString().slice(0, 7);
+      setSelectedMonth(currentMonth);
     }
   }, [user]);
 
@@ -56,11 +61,16 @@ function App() {
     return <Login />;
   }
 
-  const totalIncome = transactions
+  // Filter transactions by selected month
+  const filteredTransactions = selectedMonth
+    ? transactions.filter((item) => item.month === selectedMonth)
+    : transactions;
+
+  const totalIncome = filteredTransactions
     .filter((item) => item.type === "income")
     .reduce((sum, item) => sum + item.amount, 0);
 
-  const totalExpense = transactions
+  const totalExpense = filteredTransactions
     .filter((item) => item.type === "expense")
     .reduce((sum, item) => sum + item.amount, 0);
 
@@ -68,7 +78,7 @@ function App() {
 
   return (
     <Layout>
-      <Topbar onLogout={logout} userEmail={user.email} />
+      <Topbar onLogout={logout} userEmail={user.email} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
 
       <section className="hero">
         <div>
@@ -95,12 +105,12 @@ function App() {
           />
         </div>
 
-        <ExpenseChart transactions={transactions} />
+        <ExpenseChart transactions={filteredTransactions} />
       </section>
 
       <TransactionTable
-        transactions={transactions}
-        onEdit={setEditingTransaction}
+        transactions={filteredTransactions}
+        onEdit={(transaction) => setEditingTransaction(transaction)}
         onDelete={handleDelete}
       />
     </Layout>
