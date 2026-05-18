@@ -7,7 +7,7 @@ import {
   Legend,
 } from "recharts";
 
-const COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#8b5cf6"];
+const COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#8b5cf6", "#ec4899", "#f43f5e", "#d946ef", "#06b6d4", "#14b8a6", "#64748b"];
 
 function ExpenseChart({ transactions }) {
   const expenses = transactions.filter((item) => item.type === "expense");
@@ -34,7 +34,7 @@ function ExpenseChart({ transactions }) {
       {chartData.length === 0 ? (
         <p className="empty-text">No expense data yet.</p>
       ) : (
-        <ResponsiveContainer width="100%" height={280}>
+        <ResponsiveContainer width="100%" height={470}>
           <PieChart>
             <Pie
               data={chartData}
@@ -50,7 +50,7 @@ function ExpenseChart({ transactions }) {
             </Pie>
 
             <Tooltip formatter={(value) => `৳${value}`} />
-            <Legend />
+              <Legend wrapperStyle={{ marginTop: "50px" }} />
           </PieChart>
         </ResponsiveContainer>
       )}

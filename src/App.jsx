@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, logout } from "./firebase/auth";
 import { deleteTransaction, getTransactions } from "./firebase/transactions";
@@ -8,6 +8,8 @@ import Layout from "./components/Layout";
 import Topbar from "./components/Topbar";
 import TransactionTable from "./components/TransactionTable";
 import ExpenseChart from "./components/ExpenseChart";
+import Calendar from "./components/Calendar";
+import ActivityLog from "./components/ActivityLog";
 import Login from "./components/Login";
 
 function App() {
@@ -15,7 +17,16 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
   const [editingTransaction, setEditingTransaction] = useState(null);
-  const [selectedMonth, setSelectedMonth] = useState("");
+  const [activityLogs, setActivityLogs] = useState(() => {
+    const stored = localStorage.getItem("activityLogs");
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // Initialize with current month
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const today = new Date();
+    return today.toISOString().slice(0, 7);
+  });
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -26,26 +37,38 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  async function loadData() {
+  const addActivityLog = useCallback((type, description = "") => {
+    const newLog = {
+      type,
+      description,
+      timestamp: new Date().toISOString(),
+    };
+
+    setActivityLogs((prevLogs) => {
+      const updatedLogs = [...prevLogs, newLog];
+      localStorage.setItem("activityLogs", JSON.stringify(updatedLogs));
+      return updatedLogs;
+    });
+  }, []);
+
+  const loadData = useCallback(async () => {
     const data = await getTransactions();
     setTransactions(data);
-  }
+  }, []);
 
   useEffect(() => {
     if (user) {
+      // Load transaction data
       loadData();
-      // Set default month to current month
-      const today = new Date();
-      const currentMonth = today.toISOString().slice(0, 7);
-      setSelectedMonth(currentMonth);
     }
-  }, [user]);
+  }, [user, loadData]);
 
   async function handleDelete(id) {
     const confirmDelete = confirm("Delete this transaction?");
     if (!confirmDelete) return;
 
     await deleteTransaction(id);
+    addActivityLog("transaction_delete");
     await loadData();
   }
 
@@ -102,17 +125,24 @@ function App() {
             onTransactionAdded={loadData}
             editingTransaction={editingTransaction}
             onCancelEdit={handleCancelEdit}
+            onLogActivity={addActivityLog}
           />
         </div>
 
-        <ExpenseChart transactions={filteredTransactions} />
+        <div className="right-sidebar">
+          <ExpenseChart transactions={filteredTransactions} />
+          <Calendar />
+          <ActivityLog logs={activityLogs} />
+        </div>
       </section>
 
-      <TransactionTable
-        transactions={filteredTransactions}
-        onEdit={(transaction) => setEditingTransaction(transaction)}
-        onDelete={handleDelete}
-      />
+      <section className="table-section">
+        <TransactionTable
+          transactions={filteredTransactions}
+          onEdit={(transaction) => setEditingTransaction(transaction)}
+          onDelete={handleDelete}
+        />
+      </section>
     </Layout>
   );
 }

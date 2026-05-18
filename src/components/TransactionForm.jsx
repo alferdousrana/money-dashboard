@@ -5,6 +5,7 @@ function TransactionForm({
   onTransactionAdded,
   editingTransaction,
   onCancelEdit,
+  onLogActivity,
 }) {
   const [form, setForm] = useState({
     type: "expense",
@@ -54,10 +55,17 @@ function TransactionForm({
     if (editingTransaction) {
       await updateTransaction(editingTransaction.id, form);
       alert("Transaction updated!");
+      if (onLogActivity) {
+        onLogActivity("transaction_edit");
+      }
       onCancelEdit();
     } else {
       await addTransaction(form);
       alert("Transaction added!");
+      if (onLogActivity) {
+        const logType = form.type === "income" ? "income_add" : "expense_add";
+        onLogActivity(logType);
+      }
     }
 
     onTransactionAdded();
