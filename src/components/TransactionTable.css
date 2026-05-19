@@ -53,6 +53,16 @@ th {
   font-size: 14px;
 }
 
+th:hover {
+  background: #f3f4f6;
+}
+
+th.filter-active {
+  background: #e0e7ff;
+  color: #4338ca;
+  font-weight: 600;
+}
+
 td {
   padding: 16px 14px;
   border-bottom: 1px solid #f1f5f9;
