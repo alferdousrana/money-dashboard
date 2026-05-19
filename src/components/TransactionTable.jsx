@@ -1,7 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
 import "./TransactionTable.css";
 
 function TransactionTable({ transactions, onEdit, onDelete }) {
+  const [typeFilter, setTypeFilter] = useState(null); // null, "income", "expense"
+  const [sortBy, setSortBy] = useState(null); // null, "date", "amount"
+  const [sortOrder, setSortOrder] = useState("asc"); // "asc" or "desc"
+
+  // Handle Type Filter
+  const handleTypeFilter = () => {
+    if (typeFilter === null) {
+      setTypeFilter("income");
+    } else if (typeFilter === "income") {
+      setTypeFilter("expense");
+    } else {
+      setTypeFilter(null); // Reset to show all
+    }
+  };
+
+  // Handle Date Sort
+  const handleDateSort = () => {
+    if (sortBy === "date") {
+      if (sortOrder === "asc") {
+        setSortOrder("desc");
+      } else {
+        setSortBy(null); // Reset
+        setSortOrder("asc");
+      }
+    } else {
+      setSortBy("date");
+      setSortOrder("asc");
+    }
+  };
+
+  // Handle Amount Sort
+  const handleAmountSort = () => {
+    if (sortBy === "amount") {
+      if (sortOrder === "asc") {
+        setSortOrder("desc");
+      } else {
+        setSortBy(null); // Reset
+        setSortOrder("asc");
+      }
+    } else {
+      setSortBy("amount");
+      setSortOrder("asc");
+    }
+  };
+
+  // Filter transactions by type
+  let filteredTransactions = transactions;
+  if (typeFilter) {
+    filteredTransactions = transactions.filter(
+      (t) => t.type === typeFilter
+    );
+  }
+
+  // Sort transactions
+  if (sortBy === "date") {
+    filteredTransactions = [...filteredTransactions].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+    });
+  } else if (sortBy === "amount") {
+    filteredTransactions = [...filteredTransactions].sort((a, b) => {
+      return sortOrder === "asc" ? a.amount - b.amount : b.amount - a.amount;
+    });
+  }
 
   const handlePrint = () => {
     const printContents =
@@ -95,17 +160,46 @@ function TransactionTable({ transactions, onEdit, onDelete }) {
         <table>
           <thead>
             <tr>
-              <th>Type</th>
+              <th 
+                onClick={handleTypeFilter}
+                className={typeFilter ? "filter-active" : ""}
+                style={{ cursor: "pointer" }}
+                title={typeFilter ? `Showing: ${typeFilter}` : "Click to filter"}
+              >
+                Type {typeFilter && `(${typeFilter})`}
+              </th>
               <th>Category</th>
-              <th>Date</th>
+              <th 
+                onClick={handleDateSort}
+                className={sortBy === "date" ? "filter-active" : ""}
+                style={{ cursor: "pointer" }}
+                title={
+                  sortBy === "date"
+                    ? `${sortOrder === "asc" ? "Asc" : "Desc"} - Click again to sort`
+                    : "Click to sort"
+                }
+              >
+                Date {sortBy === "date" && `(${sortOrder === "asc" ? "↑" : "↓"})`}
+              </th>
               <th>Note</th>
-              <th>Amount</th>
+              <th 
+                onClick={handleAmountSort}
+                className={sortBy === "amount" ? "filter-active" : ""}
+                style={{ cursor: "pointer" }}
+                title={
+                  sortBy === "amount"
+                    ? `${sortOrder === "asc" ? "Low to High" : "High to Low"} - Click again to sort`
+                    : "Click to sort"
+                }
+              >
+                Amount {sortBy === "amount" && `(${sortOrder === "asc" ? "↑" : "↓"})`}
+              </th>
               <th className="no-print">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {transactions.map((item) => (
+            {filteredTransactions.map((item) => (
               <tr key={item.id}>
 
                 <td>
